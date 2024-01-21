@@ -124,14 +124,9 @@
 
     # geoip lookup
     if (req.url.path ~ "fastlyCdn/geoip/getaction/") {
-        # check if GeoIP has been already processed by client. this normally happens before essential cookies are set.
-        if (req.http.cookie:X-Magento-Vary || req.http.cookie:form_key || req.http.cookie:fastly_geo_store) {
-            error 980 "GeoIP already processed";
-        } else {
-            # append parameter with country code only if it doesn't exist already
-            if ( req.url.qs !~ "country_code=" ) {
-                set req.url = querystring.set(req.url, "country_code", if ( req.http.geo_override, req.http.geo_override, client.geo.country_code));
-            }
+        # append parameter with country code only if it doesn't exist already
+        if ( req.url.qs !~ "country_code=" ) {
+            set req.url = querystring.set(req.url, "country_code", if ( req.http.geo_override, req.http.geo_override, client.geo.country_code));
         }
     } else if ( req.url.path !~ "/graphql" ) {
         # Per suggestions in https://github.com/sdinteractive/SomethingDigital_PageCacheParams
